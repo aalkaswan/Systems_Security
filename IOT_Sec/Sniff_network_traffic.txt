@@ -1,0 +1,17 @@
+We inspected the traffic using wireshark.
+
+The board mostly subscribes to MQTT messages.
+The board conducts a TCP handshake with the server, the issue with this handshake is that it is not done correctly, the packets are not signed by a CA.
+After mouning a MITM attack using the following command:
+mitmproxy --mode transparent --showhost --ssl-insecure
+we obtain an API key:
+"apikey": "52Fqkjxc897I9i86HnM"
+
+After performing the following curl request:
+curl -k -- header "Content-Type: application/json" \
+--request POST
+--data '{"apikey": "52dFqkjxc89719186HnM"}' \
+https://syssec.ewi.utwente.nl/startup
+
+We obtain the following credentials, with these we should be able to publish and subscribe to MQTT messages.
+{"mgtt":{"host":"syssec.ewi.utwente.nl","password":"c9JFyl2h8L","port":1883,"username": "wemos60"}, "status":200}
