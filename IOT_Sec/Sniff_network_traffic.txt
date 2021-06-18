@@ -1,17 +1,25 @@
+## Group 60
+
 We inspected the traffic using wireshark.
 
-The board mostly subscribes to MQTT messages.
-The board conducts a TCP handshake with the server, the issue with this handshake is that it is not done correctly, the packets are not signed by a CA.
+The device starts by sending some EAPOL messages to my network-card.
+These messages are to establish a secure connection between them. 
+Then the device sends a DHCP requeste and it gets an ip-address.
+Then it sends a ARP request looking for the syssec.ewi.utwente.nl server. It then performs a TCP handshake between them.
+The board then becomes active connects to the MQTT server and subscribes to led/wemos60/action. 
+It regularly recieves MQTT commands from the server and sends back ACK messages over TCP.
+
+We can intercept some messages using a man-in-the-middle attack, this allows us to sit inbetween the server and board, and decrypt their messages. 
+We configured the mitmproxy attack as described in: https://docs.mitmproxy.org/stable/howto-transparent/ (starting from step 2)
 After mouning a MITM attack using the following command:
-mitmproxy --mode transparent --showhost --ssl-insecure
-we obtain an API key:
+mitmproxy --mode transparent --showhost 
+
+We restart the board and intercept a single message, we obtain an API key:
 "apikey": "52Fqkjxc897I9i86HnM"
 
+We can use this API key to then contact the server.
 After performing the following curl request:
-curl -k -- header "Content-Type: application/json" \
---request POST
---data '{"apikey": "52dFqkjxc89719186HnM"}' \
-https://syssec.ewi.utwente.nl/startup
+curl --header "Content-Type: application/json" --request POST --data '{"apikey":"52dFqkjxc897I9i86HnM"}'  http://syssec.ewi.utwente.nl/startup
 
 We obtain the following credentials, with these we should be able to publish and subscribe to MQTT messages.
 {"mgtt":{"host":"syssec.ewi.utwente.nl","password":"c9JFyl2h8L","port":1883,"username": "wemos60"}, "status":200}

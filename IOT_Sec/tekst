@@ -1,0 +1,13 @@
+The device starts by sending some EAPOL messages with a key to my network-card.
+These messages are to establish a secure connection between them. 
+Then the device sends some DHCP requests between it and the network-card. 
+And it gets an ip-address.
+Then it sends a ARP request looking for the syssec.ewi.utwente.nl server. It performs a TCP handshake between them.
+
+mosquitto_pub -h 'syssec.ewi.utwente.nl' -u 'wemos60' -P 'C9JFyl2h8L' -t 'led/wemos60/action' -m 'restart 90uG39tSNC3u2YTQ'
+
+
+led/wemos60/action ADMIN 90uG39tSNC3u2YTQ
+led/wemos60/action master_secret: 4S0duGvQTyVVEP2v
+
+

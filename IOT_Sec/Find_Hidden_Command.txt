@@ -1,0 +1,34 @@
+We extract the firmware and import the files into Ghidra as shown in the lecture. We also add the brom? memory block, but this might not be neccesary. 
+
+To start the search for commands we search for all strings in Ghidra. Looking through the found strings, we see an interesting one: "Message Arrived [".
+This is the message that the board prints to the serial port. This string is only used in a single function, we will attempt to find the hidden commands in this function.
+We believe that param_1 is the topic, since it it printed between the brackets behind "Message Arrived". param_2 is likely the command, param_3 is then likely the length of the command, since it is only an integer.
+We exported the function to c, it will also be handed in with this report.
+
+The first hidden command that we find is restart. In line 47, param_2 (which is likely the command) is compared with the string "restart ".
+The rest of the command is compared with "90uG39tSNC3u2YTQ". This might be some kind of code that is unique per device.
+
+While listening to the serial port using 'screen', we publish the message on MQTT:
+
+mosquitto_pub -h 'syssec.ewi.utwente.nl' -u 'wemos60' -P 'C9JFyl2h8L' -t 'led/wemos60/action' -m 'restart 90uG39tSNC3u2YTQ'
+
+This causes the board to restart and we can read a restart message from the serial port.
+
+Message arrived [led/wemos60/action] Restart
+
+ ets Jan  8 2013,rst cause:2, boot mode:(3,6)
+
+load 0x4010f000, len 3584, room 16 
+tail 0
+chksum 0xb0
+csum 0xb0
+v2843a5ac
+~ld
+   *WM: 
+*WM: AutoConnect
+*WM: Connecting as wifi client...
+*WM: Status:
+*WM: 6
+*WM: Using last saved values, should be faster
+
+We have found the restart command, we will further investigate this function of code in the 'Find all Hidden Commands' Assignment.

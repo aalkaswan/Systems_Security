@@ -1,0 +1,40 @@
+## Assignment Group 60
+
+Continuing from where we left off in the 'Find Hidden Command' assingment, we can find a very similar code block starting at line 57.
+
+Here the beginning of the command is matched with "ADMIN "  and the rest of ths string is matched with "90uG39tSNC3u2YTQ".
+Sending the "ADMIN 90uG39tSNC3u2YTQ" command over MQTT, causes the board to print "Unknown" on the serial output.
+But by using mosquitto_sub we can see that the board has published the following message with its master key:
+
+This leaves us to believe that this is the vulnerability that we have to exploit later to get the master secret of any board. We will have to further explore this in the exploit assignment.
+In line 30 we can find that there is a certain 3 symbol command that is also accepted by the board. We will need to find a string that makes this true:  
+(((uint)(param_2[2] ^ *param_2) ^ (uint)param_2[1] << 1) == 0x68)
+
+We will simply bruteforce this, using the following program in C:
+
+int main()
+{
+    char param_2[] = "aaa";
+    char *source = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    for (int i = 0; i < strlen(source); i++) {
+        param_2[0] = source[i];
+        for (int j = 0; j < strlen(source); j++) {
+            param_2[1] = source[j];
+            for (int h = 0; h < strlen(source); h++) {
+                param_2[2] = source[h];
+                if((((unsigned int)(param_2[2] ^ *param_2) ^ (unsigned int)param_2[1] << 1) == 0x68))
+                printf("%s,", param_2);
+            }
+        }
+    }
+}
+
+This gives us the following possibilities:
+a0i,a1k,a2m,a3o,a4a,a5c ... (around 500 more)
+
+We will simply pick the first one since they should all trigger the same command.
+
+We cannot see anyhting in the screen of the serial bus, but we can observe that the led of the board begins blinking rapidly. 
+Looking at the code in ghidra we can see that there is a loop that seems to turn the light on, waits, turns it off then waits again, 20 times.  
+
+With this we have found all the 5 commands (3 hidden, 2 not hidden).
